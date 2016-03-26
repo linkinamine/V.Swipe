@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/mac/.gradle/caches/modules-2/files-2.1/com.github.bumptech.glide/glide/3.5.1/4401b15ca6aad7bc187e8daea1c84e9674186ea8/glide-3.5.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="4401b15ca6aad7bc187e8daea1c84e9674186ea8">
+        <dex dex="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/pre-dexed/debug/glide-3.5.1_5863ba5e7d462139b3ddc948c589289b436386bf.jar" />
+    </item>
+    <item
+        jar="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="f8efd0096475e0daf054267b61544e10dc776503">
+        <dex dex="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/pre-dexed/debug/com.android.support-support-v4-22.2.1_9487d99f4289aee5ba96c8f037b256d6d33b9654.jar" />
+    </item>
+    <item
+        jar="/Users/mac/Downloads/adt-bundle-mac-x86_64-20131030/sdk/extras/android/m2repository/com/android/support/support-annotations/22.2.1/support-annotations-22.2.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="61a0ff5c29295ec56d7e0bd3d25d95dbf71b4b2b">
+        <dex dex="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/pre-dexed/debug/support-annotations-22.2.1_ac3fd23e69dd0b429e43349e7a0f269b58c744c0.jar" />
+    </item>
+    <item
+        jar="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.2.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="4486e953d1f35f8ccab098b1dd67146366d5f731">
+        <dex dex="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/pre-dexed/debug/com.android.support-appcompat-v7-22.2.1_7819f10d82e463018d8b0314cb7b7482135977b1.jar" />
+    </item>
+    <item
+        jar="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.2.1/jars/libs/internal_impl-22.2.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="c471eaaba13ff64f6e0383d1c30a9cdc9a97efeb">
+        <dex dex="/Users/mac/ASProjects/FollowSwipe/app/build/intermediates/pre-dexed/debug/internal_impl-22.2.1_ddbc5d0ec9776b2b9f2ecae1e260bd56a9ac1021.jar" />
+    </item>
+
+</items>

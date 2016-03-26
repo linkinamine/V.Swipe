@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">TinderSwipe</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+
+
+    <string name="client_id">19adbb397d414d4584159449591ab914</string>
+    <string name="client_secret">05064e88472445a19ffcdd9ce38b7354</string>
+    <string name="website_url">http://Right2Follow.com</string>
+    <string name="redirect_uri">https://Right2Follow</string>
+
+
+</resources>
