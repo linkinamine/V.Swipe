@@ -12,8 +12,15 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
-import com.vineSwipe.swipe.data.Data;
+import com.vineSwipe.swipe.data.ImageData;
+import com.vineSwipe.swipe.helpers.StubHelper;
+import com.vineSwipe.swipe.net.NetworkManager;
+import com.vineSwipe.swipe.net.giphy.TrendingRequest;
+import com.vineSwipe.swipe.net.giphy.model.GiphyResponse;
 import com.vineSwipe.swipe.tindercard.FlingCardListener;
 import com.vineSwipe.swipe.tindercard.SwipeFlingAdapterView;
 
@@ -25,8 +32,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     public static MyAppAdapter myAppAdapter;
     public static ViewHolder viewHolder;
-    private ArrayList<Data> al;
+    private ArrayList<ImageData> al;
     private SwipeFlingAdapterView flingContainer;
+    private String TAG = "swipeX";
 
     public static void removeBackground() {
 
@@ -35,6 +43,33 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         myAppAdapter.notifyDataSetChanged();
 
     }
+
+//    private static String createQuery(String type, String keyword, String limit) {
+//
+//        String moreData = "";
+//
+//        //type= search , random ,trending
+//
+//        // http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key=dc6zaTOxFJmzC
+//        // http://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzC&limit=5
+//
+//        switch (type) {
+//
+//            case "search":
+//                type = type + "?q=" + keyword;
+//                break;
+//            case "random":
+//                break;
+//            case "trending":
+//                moreData = "limit=" + limit;
+//                break;
+//
+//        }
+//
+//
+//
+//        return query;
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,13 +139,44 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     }
 
+
+    private void loadRecent() {
+        Request trendingRequest = new TrendingRequest(new Response.Listener<GiphyResponse>() {
+            @Override
+            public void onResponse(GiphyResponse response) {
+                // mAdapter.showResults("Trending", response.getImages());
+
+                Log.e(TAG, "response imqges! " + response.getImages());
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Unhandled error! " + error);
+                StubHelper.showYouBrokeItDialog(
+                        "Couldn't load search results. Are you connected to the internet?",
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                loadRecent();
+                            }
+                        },
+                        MainActivity.this);
+            }
+        });
+
+        NetworkManager.getInstance(MainActivity.this).addToRequestQueue(trendingRequest);
+    }
+
+
     private void getData() {
 
+        loadRecent();
 
-        al.add(new Data("https://media.giphy.com/media/3o7abqPKlcPasOJGBG/giphy.gif", "Inspiration Feed"));
-        al.add(new Data("https://media.giphy.com/media/uPD6M9fj1elG/giphy.gif", "Deadpool"));
-        al.add(new Data("https://media.giphy.com/media/3o7abIn8H8TTzmQrcc/giphy.gif", "Cameron Diaz"));
-        al.add(new Data("https://media.giphy.com/media/xT9DPDoWMicL4nU3NC/giphy.gif", "Julianne Moore"));
+        al.add(new ImageData("https://media.giphy.com/media/3o7abqPKlcPasOJGBG/giphy.gif", "Inspiration Feed"));
+        al.add(new ImageData("https://media.giphy.com/media/uPD6M9fj1elG/giphy.gif", "Deadpool"));
+        al.add(new ImageData("https://media.giphy.com/media/3o7abIn8H8TTzmQrcc/giphy.gif", "Cameron Diaz"));
+        al.add(new ImageData("https://media.giphy.com/media/xT9DPDoWMicL4nU3NC/giphy.gif", "Julianne Moore"));
 
 
     }
@@ -131,10 +197,10 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     public class MyAppAdapter extends BaseAdapter {
 
 
-        public List<Data> parkingList;
+        public List<ImageData> parkingList;
         public Context context;
 
-        private MyAppAdapter(List<Data> apps, Context context) {
+        private MyAppAdapter(List<ImageData> apps, Context context) {
             this.parkingList = apps;
             this.context = context;
         }
