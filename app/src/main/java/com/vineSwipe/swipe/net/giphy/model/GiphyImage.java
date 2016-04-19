@@ -27,7 +27,7 @@ public class GiphyImage implements Parcelable {
     }
 
     private ImageVariation getPreferredVariation() {
-        return images.get("fixed_width");
+        return images.get("original");
     }
 
     /**
@@ -41,7 +41,7 @@ public class GiphyImage implements Parcelable {
      * @return a URL that can be used to load the image for display in the app.
      */
     public String getUrl() {
-        return getPreferredVariation().webp;
+        return getPreferredVariation().url;
     }
 
     public int getWidth() {

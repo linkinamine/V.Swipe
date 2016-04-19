@@ -5,6 +5,7 @@ package com.vineSwipe.swipe.data;
  */
 public class ImageData {
 
+
     private String description;
 
     private String imagePath;
@@ -21,5 +22,14 @@ public class ImageData {
     public String getImagePath() {
         return imagePath;
     }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
 
 }

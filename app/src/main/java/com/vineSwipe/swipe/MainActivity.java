@@ -1,6 +1,7 @@
 package com.vineSwipe.swipe;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,10 +17,14 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.vineSwipe.swipe.data.ImageData;
 import com.vineSwipe.swipe.helpers.StubHelper;
+import com.vineSwipe.swipe.helpers.Tools;
 import com.vineSwipe.swipe.net.NetworkManager;
 import com.vineSwipe.swipe.net.giphy.TrendingRequest;
+import com.vineSwipe.swipe.net.giphy.model.GiphyImage;
 import com.vineSwipe.swipe.net.giphy.model.GiphyResponse;
 import com.vineSwipe.swipe.tindercard.FlingCardListener;
 import com.vineSwipe.swipe.tindercard.SwipeFlingAdapterView;
@@ -33,8 +38,12 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     public static MyAppAdapter myAppAdapter;
     public static ViewHolder viewHolder;
     private ArrayList<ImageData> al;
+    private List<GiphyImage> giphyImages;
+
     private SwipeFlingAdapterView flingContainer;
-    private String TAG = "swipeX";
+    private String TAG = "com.vineswipe.swipe";
+    private GiphyImage giphyImage;
+    public static int numberOfCards = 10;
 
     public static void removeBackground() {
 
@@ -44,32 +53,6 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     }
 
-//    private static String createQuery(String type, String keyword, String limit) {
-//
-//        String moreData = "";
-//
-//        //type= search , random ,trending
-//
-//        // http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key=dc6zaTOxFJmzC
-//        // http://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzC&limit=5
-//
-//        switch (type) {
-//
-//            case "search":
-//                type = type + "?q=" + keyword;
-//                break;
-//            case "random":
-//                break;
-//            case "trending":
-//                moreData = "limit=" + limit;
-//                break;
-//
-//        }
-//
-//
-//
-//        return query;
-//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,14 +60,12 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         setContentView(R.layout.activity_main);
 
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
-
         al = new ArrayList<>();
-
-
-        getData();
-
-
         myAppAdapter = new MyAppAdapter(al, MainActivity.this);
+        setCards();
+        loadRecent();
+
+
         flingContainer.setAdapter(myAppAdapter);
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
             @Override
@@ -111,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
-
+                //TODO:  Refresh : get new cards
             }
 
             @Override
@@ -129,25 +110,31 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
-
                 View view = flingContainer.getSelectedView();
                 view.findViewById(R.id.background).setAlpha(0);
-
                 myAppAdapter.notifyDataSetChanged();
             }
         });
 
     }
 
+    private void setCards() {
+
+        Uri uri = Tools.resourceIdToUri(getApplicationContext(), R.drawable.loading);
+        Glide.with(getApplicationContext()).load(uri).into(viewHolder.cardImage);
+//        for (int i = 0; i < numberOfCards; i++) {
+//            al.add(i, new ImageData(LoadingGifUri, "Loading..."));
+//        }
+    }
+
 
     private void loadRecent() {
-        Request trendingRequest = new TrendingRequest(new Response.Listener<GiphyResponse>() {
+        Request trendingRequest = new TrendingRequest(String.valueOf(numberOfCards), new Response.Listener<GiphyResponse>() {
             @Override
             public void onResponse(GiphyResponse response) {
                 // mAdapter.showResults("Trending", response.getImages());
-
-                Log.e(TAG, "response imqges! " + response.getImages());
-
+                giphyImages = response.getImages();
+                fillCardView();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -168,18 +155,15 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         NetworkManager.getInstance(MainActivity.this).addToRequestQueue(trendingRequest);
     }
 
-
-    private void getData() {
-
-        loadRecent();
-
-        al.add(new ImageData("https://media.giphy.com/media/3o7abqPKlcPasOJGBG/giphy.gif", "Inspiration Feed"));
-        al.add(new ImageData("https://media.giphy.com/media/uPD6M9fj1elG/giphy.gif", "Deadpool"));
-        al.add(new ImageData("https://media.giphy.com/media/3o7abIn8H8TTzmQrcc/giphy.gif", "Cameron Diaz"));
-        al.add(new ImageData("https://media.giphy.com/media/xT9DPDoWMicL4nU3NC/giphy.gif", "Julianne Moore"));
+    private void fillCardView() {
 
 
+        for (int i = 0; i < numberOfCards; i++) {
+            Log.e(TAG, giphyImages.get(i).getUrl());
+            al.add(new ImageData(giphyImages.get(i).getUrl(), ""));
+        }
     }
+
 
     @Override
     public void onActionDownPerform() {
@@ -195,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     }
 
     public class MyAppAdapter extends BaseAdapter {
-
 
         public List<ImageData> parkingList;
         public Context context;
@@ -224,7 +207,12 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         public View getView(final int position, View convertView, ViewGroup parent) {
 
             View rowView = convertView;
+            ImageViewTarget<ImageView> imageViewTarget = new ImageViewTarget<ImageView>(viewHolder.cardImage) {
+                @Override
+                protected void setResource(ImageView resource) {
 
+                }
+            };
 
             if (rowView == null) {
 
@@ -235,6 +223,8 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 viewHolder.DataText = (TextView) rowView.findViewById(R.id.bookText);
                 viewHolder.background = (FrameLayout) rowView.findViewById(R.id.background);
                 viewHolder.cardImage = (ImageView) rowView.findViewById(R.id.cardImage);
+
+
                 rowView.setTag(viewHolder);
 
             } else {
@@ -243,10 +233,10 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             viewHolder.DataText.setText(parkingList.get(position).getDescription() + "");
 
 
-            Glide.with(MainActivity.this).load(parkingList.get(position).getImagePath()).asGif().error(R.drawable.nope).into(viewHolder.cardImage);
-
-            Log.i("Image Path", parkingList.get(position).getImagePath());
+            Glide.with(context).load(parkingList.get(position).getImagePath()).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .error(R.drawable.error).into(viewHolder.cardImage);
             return rowView;
         }
+
     }
 }

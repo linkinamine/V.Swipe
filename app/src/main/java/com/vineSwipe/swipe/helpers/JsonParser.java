@@ -1,4 +1,4 @@
-package com.vineSwipe.swipe.util;
+package com.vineSwipe.swipe.helpers;
 
 import org.json.JSONObject;
 
