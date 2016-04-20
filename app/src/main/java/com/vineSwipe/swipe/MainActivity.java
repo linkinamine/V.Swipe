@@ -18,7 +18,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.ImageViewTarget;
+import com.bumptech.glide.request.target.Target;
 import com.vineSwipe.swipe.data.ImageData;
 import com.vineSwipe.swipe.helpers.StubHelper;
 import com.vineSwipe.swipe.helpers.Tools;
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     private String TAG = "com.vineswipe.swipe";
     private GiphyImage giphyImage;
     public static int numberOfCards = 10;
+    private Uri uri;
 
     public static void removeBackground() {
 
@@ -62,8 +66,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
         al = new ArrayList<>();
         myAppAdapter = new MyAppAdapter(al, MainActivity.this);
-        setCards();
         loadRecent();
+
+        uri = Tools.resourceIdToUri(getApplicationContext(), R.drawable.loading);
 
 
         flingContainer.setAdapter(myAppAdapter);
@@ -118,21 +123,13 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     }
 
-    private void setCards() {
-
-        Uri uri = Tools.resourceIdToUri(getApplicationContext(), R.drawable.loading);
-        Glide.with(getApplicationContext()).load(uri).into(viewHolder.cardImage);
-//        for (int i = 0; i < numberOfCards; i++) {
-//            al.add(i, new ImageData(LoadingGifUri, "Loading..."));
-//        }
-    }
-
 
     private void loadRecent() {
-        Request trendingRequest = new TrendingRequest(String.valueOf(numberOfCards), new Response.Listener<GiphyResponse>() {
+        Request trendingRequest = new TrendingRequest(String.valueOf(numberOfCards).toString(), new Response.Listener<GiphyResponse>() {
             @Override
             public void onResponse(GiphyResponse response) {
                 // mAdapter.showResults("Trending", response.getImages());
+
                 giphyImages = response.getImages();
                 fillCardView();
             }
@@ -207,12 +204,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         public View getView(final int position, View convertView, ViewGroup parent) {
 
             View rowView = convertView;
-            ImageViewTarget<ImageView> imageViewTarget = new ImageViewTarget<ImageView>(viewHolder.cardImage) {
-                @Override
-                protected void setResource(ImageView resource) {
 
-                }
-            };
 
             if (rowView == null) {
 
@@ -224,17 +216,36 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 viewHolder.background = (FrameLayout) rowView.findViewById(R.id.background);
                 viewHolder.cardImage = (ImageView) rowView.findViewById(R.id.cardImage);
 
-
+                viewHolder.cardImage.setImageDrawable(getDrawable(R.drawable.loading));
                 rowView.setTag(viewHolder);
+
 
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+
+            //  RequestBuilder<Drawable> thumbnailRequest = Glide.with(context).load(uri);
             viewHolder.DataText.setText(parkingList.get(position).getDescription() + "");
 
+            // GifRequestBuilder<Uri> thumbnailRequest = Glide
+            //       .with(context).load(uri).asGif();
 
-            Glide.with(context).load(parkingList.get(position).getImagePath()).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .error(R.drawable.error).into(viewHolder.cardImage);
+            Glide.with(context).load(parkingList.get(position).getImagePath()).asGif().placeholder(R.drawable.loading).diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .error(R.drawable.error).listener(new RequestListener<String, GifDrawable>() {
+                @Override
+                public boolean onException(Exception e, String model, Target<GifDrawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(GifDrawable resource, String model, Target<GifDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+
+                    return false;
+                }
+
+
+            }).into(viewHolder.cardImage);
+            //
             return rowView;
         }
 
