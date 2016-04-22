@@ -212,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 viewHolder.DataText = (TextView) rowView.findViewById(R.id.bookText);
                 viewHolder.background = (FrameLayout) rowView.findViewById(R.id.background);
                 viewHolder.cardImage = (ImageView) rowView.findViewById(R.id.cardImage);
-                viewHolder.cardImage.setImageDrawable(getDrawable(R.drawable.loading));
                 rowView.setTag(viewHolder);
 
             } else {
@@ -220,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             }
 
             viewHolder.DataText.setText(parkingList.get(position).getDescription() + "");
-            Glide.with(context).load(parkingList.get(position).getImagePathThumbnail()).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE)
+            Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathFull()).asGif().thumbnail(Glide.with(context.getApplicationContext()).load(R.raw.loading).asGif()).diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .error(R.drawable.error).listener(new RequestListener<String, GifDrawable>() {
                 @Override
                 public boolean onException(Exception e, String model, Target<GifDrawable> target, boolean isFirstResource) {
@@ -231,7 +230,8 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 @Override
                 public boolean onResourceReady(GifDrawable resource, String model, Target<GifDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                     Log.d(TAG, "onResourceReady RequestListener");
-                    Glide.with(context).load(parkingList.get(position).getImagePathFull()).asGif();
+
+                    //Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathFull()).asGif();
                     return false;
                 }
 
