@@ -7,29 +7,38 @@ public class ImageData {
 
 
     private String description;
+    private String imagePathFull;
+    private String imagePathThumbnail;
 
-    private String imagePath;
 
-    public ImageData(String imagePath, String description) {
-        this.imagePath = imagePath;
+    public ImageData(String imagePathFull, String imagePathThumbnail, String description) {
+        this.imagePathFull = imagePathFull;
         this.description = description;
+        this.imagePathThumbnail = imagePathThumbnail;
     }
+
 
     public String getDescription() {
         return description;
-    }
-
-    public String getImagePath() {
-        return imagePath;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public String getImagePathThumbnail() {
+        return imagePathThumbnail;
     }
 
+    public void setImagePathThumbnail(String imagePathThumbnail) {
+        this.imagePathThumbnail = imagePathThumbnail;
+    }
 
+    public String getImagePathFull() {
+        return imagePathFull;
+    }
+
+    public void setImagePathFull(String imagePathFull) {
+        this.imagePathFull = imagePathFull;
+    }
 }

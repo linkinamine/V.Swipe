@@ -10,4 +10,8 @@ public final class Constants {
      * See: https://github.com/Giphy/GiphyAPI#public-beta-key
      */
     public static final String GIPHY_KEY = "dc6zaTOxFJmzC";
+
+
+    public static int NUMBEROFCARDS = 10;
+
 }

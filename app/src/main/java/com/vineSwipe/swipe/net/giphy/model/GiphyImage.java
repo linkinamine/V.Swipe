@@ -30,6 +30,10 @@ public class GiphyImage implements Parcelable {
         return images.get("original");
     }
 
+    private ImageVariation getDownSampledVariation() {
+        return images.get("fixed_width_downsampled");
+    }
+
     /**
      * @return a URL for the web page the gif is hosted on, suitable for sharing.
      */
@@ -42,6 +46,12 @@ public class GiphyImage implements Parcelable {
      */
     public String getUrl() {
         return getPreferredVariation().url;
+    }
+    /**
+     * @return a getDownSampledUrl that can be used to load the image for display in the app.
+     */
+    public String getDownSampledUrl() {
+        return getDownSampledVariation().url;
     }
 
     public int getWidth() {
@@ -72,6 +82,7 @@ public class GiphyImage implements Parcelable {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(bitly_gif_url);
         out.writeString(getUrl());
+        out.writeString(getDownSampledUrl());
         out.writeInt(getWidth());
         out.writeInt(getHeight());
     }
