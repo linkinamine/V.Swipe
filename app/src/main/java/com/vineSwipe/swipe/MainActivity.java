@@ -27,8 +27,8 @@ import com.vineSwipe.swipe.net.NetworkManager;
 import com.vineSwipe.swipe.net.giphy.TrendingRequest;
 import com.vineSwipe.swipe.net.giphy.model.GiphyImage;
 import com.vineSwipe.swipe.net.giphy.model.GiphyResponse;
-import com.vineSwipe.swipe.tindercard.FlingCardListener;
-import com.vineSwipe.swipe.tindercard.SwipeFlingAdapterView;
+import com.vineSwipe.swipe.views.tindercard.FlingCardListener;
+import com.vineSwipe.swipe.views.tindercard.SwipeFlingAdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,37 +37,45 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     public static MyAppAdapter myAppAdapter;
     public static ViewHolder viewHolder;
-    private ArrayList<ImageData> al;
+    private static int headCardCounter = 0;
+    private static boolean triggerRecents = false;
+
+    private ArrayList<ImageData> imageDataList;
     private SwipeFlingAdapterView flingContainer;
-    private String TAG = "com.vineSwipe.swipe";
+    private List<GiphyImage> giphyImages;
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+
+    public static void removeBackground() {
+        ViewHolder.background.setVisibility(View.GONE);
+        myAppAdapter.notifyDataSetChanged();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d(TAG, " onCreate" + getClass().getCanonicalName());
+        Log.d(Constants.TAG, " onCreate " + getClass().getCanonicalName());
         setupElements();
         setupListeners();
         loadRecent();
-    }
 
-
-    public static void removeBackground() {
-        viewHolder.background.setVisibility(View.GONE);
-        myAppAdapter.notifyDataSetChanged();
     }
 
     private void setupElements() {
-        Log.d(TAG, " setupElements");
+        Log.d(Constants.TAG, " setupElements");
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
-        al = new ArrayList<>();
-        myAppAdapter = new MyAppAdapter(al, MainActivity.this);
-        al.add(new ImageData("http://media2.giphy.com/media/A4xYBEm9vD7wc/giphy.gif", "http://media2.giphy.com/media/A4xYBEm9vD7wc/200w_d.gif", ""));
+        imageDataList = new ArrayList<>();
+        giphyImages = new ArrayList<>();
+        myAppAdapter = new MyAppAdapter(imageDataList, MainActivity.this);
         flingContainer.setAdapter(myAppAdapter);
     }
 
     private void setupListeners() {
-        Log.d(TAG, " setupListeners");
+        Log.d(Constants.TAG, " setupListeners");
         flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
             @Override
             public void removeFirstObjectInAdapter() {
@@ -76,8 +84,8 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
             @Override
             public void onLeftCardExit(Object dataObject) {
-                Log.d(TAG, " onLeftCardExit");
-                al.remove(0);
+                Log.d(Constants.TAG, " onLeftCardExit");
+                imageDataList.remove(0);
                 myAppAdapter.notifyDataSetChanged();
                 //Do something on the left!
                 //You also have access to the original object.
@@ -87,21 +95,33 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
             @Override
             public void onRightCardExit(Object dataObject) {
-                Log.d(TAG, " onRightCardExit");
-                al.remove(0);
+                Log.d(Constants.TAG, " onRightCardExit");
+                imageDataList.remove(0);
                 myAppAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
-                Log.d(TAG, " onAdapterAboutToEmpty");
+                Log.d(Constants.TAG, " onAdapterAboutToEmpty " + itemsInAdapter);
 
-                //TODO:  Refresh : get new cards
+                if (headCardCounter == Constants.NUMBEROFCARDS) {
+                    Log.d(Constants.TAG, " headCardCounter == Constants.NUMBEROFCARDS " + headCardCounter + " = " + Constants.NUMBEROFCARDS);
+                    resetAllCounters();
+                    //TODO ADD RELOADING ANIMATION
+                    loadRecent();
+                }
+                if (itemsInAdapter == 2) {
+                    headCardCounter += Constants.NUMBEROFCARDSOFFSET;
+                    Log.d(Constants.TAG, "  getting next " + headCardCounter + " items");
+                    fillCardView(giphyImages);
+                }
+
+
             }
 
             @Override
             public void onScroll(float scrollProgressPercent) {
-                Log.d(TAG, "onScroll");
+                Log.d(Constants.TAG, "onScroll");
                 View view = flingContainer.getSelectedView();
                 view.findViewById(R.id.background).setAlpha(0);
                 view.findViewById(R.id.item_swipe_right_indicator).setAlpha(scrollProgressPercent < 0 ? -scrollProgressPercent : 0);
@@ -113,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
             @Override
             public void onItemClicked(int itemPosition, Object dataObject) {
-                Log.d(TAG, "onItemClicked");
+                Log.d(Constants.TAG, "onItemClicked");
                 View view = flingContainer.getSelectedView();
                 view.findViewById(R.id.background).setAlpha(0);
                 myAppAdapter.notifyDataSetChanged();
@@ -121,19 +141,31 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         });
     }
 
+    private void resetAllCounters() {
+        Log.d(Constants.TAG, "resetAllCounters");
+
+        headCardCounter = 0;
+        imageDataList.clear();
+        giphyImages.clear();
+    }
+
+    /**
+     * Giphy requests
+     */
+
     private void loadRecent() {
-        Log.d(TAG, " loadRecent ");
+        Log.d(Constants.TAG, " loadRecent ");
         Request trendingRequest = new TrendingRequest(String.valueOf(Constants.NUMBEROFCARDS).toString(), new Response.Listener<GiphyResponse>() {
             @Override
             public void onResponse(GiphyResponse response) {
-                // mAdapter.showResults("Trending", response.getImages());
-                Log.d(TAG, " onResponse ");
-                fillCardView(response.getImages());
+                Log.d(Constants.TAG, " onResponse ");
+                giphyImages = response.getImages();
+                fillCardView(giphyImages);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "Unhandled error! " + error);
+                Log.e(Constants.TAG, "Unhandled error! " + error);
                 StubHelper.showYouBrokeItDialog(
                         "Couldn't load search results. Are you connected to the internet?",
                         new Runnable() {
@@ -149,14 +181,22 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         NetworkManager.getInstance(MainActivity.this).addToRequestQueue(trendingRequest);
     }
 
-    private void fillCardView(List<GiphyImage> images) {
-        Log.d(TAG, " fillCardView ");
-        for (int i = 0; i < Constants.NUMBEROFCARDS; i++) {
-            Log.e(TAG, "url :" + images.get(i).getUrl());
-            Log.e(TAG, "downsampled url :" + images.get(i).getDownSampledUrl());
 
-            al.add(new ImageData(images.get(i).getUrl(), images.get(i).getDownSampledUrl(), ""));
+    private void fillCardView(List<GiphyImage> images) {
+        Log.d(Constants.TAG, " fillCardView ");
+        if (headCardCounter + Constants.NUMBEROFCARDSOFFSET < Constants.NUMBEROFCARDS) {
+            images = images.subList(headCardCounter, headCardCounter + Constants.NUMBEROFCARDSOFFSET);
+            for (int i = 0; i < images.size(); i++) {
+                Log.e(Constants.TAG, "url :" + images.get(i).getUrl());
+                Log.e(Constants.TAG, "downsampled url :" + images.get(i).getDownSampledUrl());
+
+                imageDataList.add(new ImageData(images.get(i).getUrl(), images.get(i).getDownSampledUrl(), ""));
+            }
+        } else {
+            Log.d(Constants.TAG, " fillCardView Call LoadRecent ");
+
         }
+
         myAppAdapter.notifyDataSetChanged();
 
     }
@@ -167,9 +207,10 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         Log.e("action", "bingo");
     }
 
+
     public static class ViewHolder {
         public static FrameLayout background;
-        public TextView DataText;
+        public TextView dataText;
         public ImageView cardImage;
 
     }
@@ -202,14 +243,16 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
 
-            Log.d(TAG, "getView MyAppAdapter");
+            Log.d(Constants.TAG, "getView MyAppAdapter");
+            Log.d(Constants.TAG, "Glide list count " + parkingList.size());
+
             View rowView = convertView;
             if (rowView == null) {
                 LayoutInflater inflater = getLayoutInflater();
                 rowView = inflater.inflate(R.layout.item, parent, false);
                 // configure view holder
                 viewHolder = new ViewHolder();
-                viewHolder.DataText = (TextView) rowView.findViewById(R.id.bookText);
+                viewHolder.dataText = (TextView) rowView.findViewById(R.id.bookText);
                 viewHolder.background = (FrameLayout) rowView.findViewById(R.id.background);
                 viewHolder.cardImage = (ImageView) rowView.findViewById(R.id.cardImage);
                 rowView.setTag(viewHolder);
@@ -218,18 +261,20 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
-            viewHolder.DataText.setText(parkingList.get(position).getDescription() + "");
-            Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathFull()).asGif().thumbnail(Glide.with(context.getApplicationContext()).load(R.raw.loading).asGif()).diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .error(R.drawable.error).listener(new RequestListener<String, GifDrawable>() {
+            viewHolder.dataText.setText(parkingList.get(position).getDescription() + "");
+
+            Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathThumbnail()).asGif().thumbnail(Glide.with(context.getApplicationContext()).load(R.raw.loading).asGif()).diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .error(R.drawable.error).dontAnimate().listener(new RequestListener<String, GifDrawable>() {
                 @Override
                 public boolean onException(Exception e, String model, Target<GifDrawable> target, boolean isFirstResource) {
-                    Log.e(TAG, "onException RequestListener");
+                    if (e != null)
+                        Log.e(Constants.TAG, "onException RequestListener : " + e.getMessage());
                     return false;
                 }
 
                 @Override
                 public boolean onResourceReady(GifDrawable resource, String model, Target<GifDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                    Log.d(TAG, "onResourceReady RequestListener");
+                    Log.d(Constants.TAG, "onResourceReady RequestListener");
 
                     //Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathFull()).asGif();
                     return false;
@@ -241,4 +286,5 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         }
 
     }
+
 }

@@ -1,4 +1,4 @@
-package com.vineSwipe.swipe.tindercard;
+package com.vineSwipe.swipe.views.tindercard;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -349,7 +349,7 @@ public class FlingCardListener implements View.OnTouchListener {
     }
 
     public interface ActionDownInterface {
-        public void onActionDownPerform();
+        void onActionDownPerform();
     }
 
 }

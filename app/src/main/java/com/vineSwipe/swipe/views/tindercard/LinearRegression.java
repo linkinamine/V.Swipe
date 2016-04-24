@@ -1,4 +1,4 @@
-package com.vineSwipe.swipe.tindercard;
+package com.vineSwipe.swipe.views.tindercard;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.vineSwipe.swipe.tindercard;
+package com.vineSwipe.swipe.views.tindercard;
 
 import android.annotation.TargetApi;
 import android.content.Context;
