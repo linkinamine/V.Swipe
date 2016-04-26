@@ -9,21 +9,31 @@ import java.util.Map;
 /**
  * A data object representing a single image on the Giphy image-hosting service.
  * GSON creates these objects when deserializing responses from the Giphy API.
- *
+ * <p/>
  * The object is Parcelable so that it can be packaged into a bundle and passed
  * to a Fragment. This is in preference to putting it into shared memory and fetching
  * it by key because fragments can effectively outlive the application process when
  * they are restored using persisted bundles.
- *
+ * <p/>
  * Created by alex on 05/10/15.
  */
 public class GiphyImage implements Parcelable {
     Map<String, ImageVariation> images;
     String bitly_gif_url;
+    String id;
+
 
     public GiphyImage() {
         // Empty constructor required because otherwise the Parcelable constructor
         // prevents GSON from being able to instantiate GiphyImages via reflection.
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     private ImageVariation getPreferredVariation() {
@@ -33,6 +43,7 @@ public class GiphyImage implements Parcelable {
     private ImageVariation getDownSampledVariation() {
         return images.get("fixed_width_downsampled");
     }
+
 
     /**
      * @return a URL for the web page the gif is hosted on, suitable for sharing.
@@ -47,6 +58,7 @@ public class GiphyImage implements Parcelable {
     public String getUrl() {
         return getPreferredVariation().url;
     }
+
     /**
      * @return a getDownSampledUrl that can be used to load the image for display in the app.
      */
@@ -68,7 +80,7 @@ public class GiphyImage implements Parcelable {
      */
     public int getHeight(int width) {
         ImageVariation variation = getPreferredVariation();
-        return Math.round(variation.height * (width/(float) variation.width));
+        return Math.round(variation.height * (width / (float) variation.width));
     }
 
     /// PARCELABLE IMPLEMENTATION
@@ -85,6 +97,7 @@ public class GiphyImage implements Parcelable {
         out.writeString(getDownSampledUrl());
         out.writeInt(getWidth());
         out.writeInt(getHeight());
+        out.writeString(getId());
     }
 
     private GiphyImage(Parcel in) {
@@ -93,6 +106,7 @@ public class GiphyImage implements Parcelable {
         variation.webp = in.readString();
         variation.width = in.readInt();
         variation.height = in.readInt();
+        id = in.readString();
         images = new HashMap<>();
         images.put("fixed_width", variation);
     }

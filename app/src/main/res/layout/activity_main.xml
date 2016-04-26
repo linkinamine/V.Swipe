@@ -18,8 +18,9 @@
         <com.vineSwipe.swipe.views.tindercard.SwipeFlingAdapterView
             android:id="@+id/frame"
             android:layout_width="match_parent"
+
             android:layout_height="match_parent"
-            android:background="@drawable/background"
+            android:background="@color/colorWhiteBg"
             app:rotation_degrees="15.5" />
 
     </FrameLayout>

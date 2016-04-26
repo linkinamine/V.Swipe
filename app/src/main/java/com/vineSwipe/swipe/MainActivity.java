@@ -37,12 +37,12 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     public static MyAppAdapter myAppAdapter;
     public static ViewHolder viewHolder;
-    private static int headCardCounter = 0;
     private static boolean triggerRecents = false;
 
     private ArrayList<ImageData> imageDataList;
     private SwipeFlingAdapterView flingContainer;
     private List<GiphyImage> giphyImages;
+    private ImageData imageDataObject;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -72,6 +72,8 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         giphyImages = new ArrayList<>();
         myAppAdapter = new MyAppAdapter(imageDataList, MainActivity.this);
         flingContainer.setAdapter(myAppAdapter);
+        imageDataObject = new ImageData();
+
     }
 
     private void setupListeners() {
@@ -85,8 +87,11 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             @Override
             public void onLeftCardExit(Object dataObject) {
                 Log.d(Constants.TAG, " onLeftCardExit");
+                Log.e(Constants.TAG, imageDataList.get(0).getImagePathThumbnail());
+
                 imageDataList.remove(0);
                 myAppAdapter.notifyDataSetChanged();
+
                 //Do something on the left!
                 //You also have access to the original object.
                 //If you want to use it just cast it (String) dataObject
@@ -96,25 +101,34 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             @Override
             public void onRightCardExit(Object dataObject) {
                 Log.d(Constants.TAG, " onRightCardExit");
+                Log.e(Constants.TAG, imageDataList.get(0).getImagePathThumbnail());
+
                 imageDataList.remove(0);
                 myAppAdapter.notifyDataSetChanged();
+
             }
 
             @Override
             public void onAdapterAboutToEmpty(int itemsInAdapter) {
                 Log.d(Constants.TAG, " onAdapterAboutToEmpty " + itemsInAdapter);
 
-                if (headCardCounter == Constants.NUMBEROFCARDS) {
-                    Log.d(Constants.TAG, " headCardCounter == Constants.NUMBEROFCARDS " + headCardCounter + " = " + Constants.NUMBEROFCARDS);
+                if (itemsInAdapter == 1) {
                     resetAllCounters();
-                    //TODO ADD RELOADING ANIMATION
+                    Glide.with(getApplicationContext()).load(R.raw.loading).asGif().error(R.drawable.error);
                     loadRecent();
                 }
-                if (itemsInAdapter == 2) {
-                    headCardCounter += Constants.NUMBEROFCARDSOFFSET;
-                    Log.d(Constants.TAG, "  getting next " + headCardCounter + " items");
-                    fillCardView(giphyImages);
-                }
+                              /*if (headCardCounter < Constants.NUMBEROFCARDS) {
+                    if (itemsInAdapter == Constants.NUMBEROFCARDTHRESHOLD) {
+                        headCardCounter = (headCardCounter + Constants.NUMBEROFCARDSOFFSET) - itemsInAdapter;
+                        Log.d(Constants.TAG, "  getting next " + headCardCounter + " items");
+                        fillCardView(giphyImages);
+                    }
+                } else {
+                    Log.d(Constants.TAG, " headCardCounter == Constants.NUMBEROFCARDS " + headCardCounter + " = " + Constants.NUMBEROFCARDS);
+                    resetAllCounters();
+                    Glide.with(getApplicationContext()).load(R.raw.loading).asGif().error(R.drawable.error);
+                    loadRecent();
+                }*/
 
 
             }
@@ -144,9 +158,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     private void resetAllCounters() {
         Log.d(Constants.TAG, "resetAllCounters");
 
-        headCardCounter = 0;
         imageDataList.clear();
         giphyImages.clear();
+
     }
 
     /**
@@ -183,19 +197,16 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
 
     private void fillCardView(List<GiphyImage> images) {
-        Log.d(Constants.TAG, " fillCardView ");
-        if (headCardCounter + Constants.NUMBEROFCARDSOFFSET < Constants.NUMBEROFCARDS) {
-            images = images.subList(headCardCounter, headCardCounter + Constants.NUMBEROFCARDSOFFSET);
-            for (int i = 0; i < images.size(); i++) {
-                Log.e(Constants.TAG, "url :" + images.get(i).getUrl());
-                Log.e(Constants.TAG, "downsampled url :" + images.get(i).getDownSampledUrl());
-
-                imageDataList.add(new ImageData(images.get(i).getUrl(), images.get(i).getDownSampledUrl(), ""));
-            }
-        } else {
-            Log.d(Constants.TAG, " fillCardView Call LoadRecent ");
-
+        Log.d(Constants.TAG, " fillCardView  ");
+        // images = images.subList(headCardCounter, (headCardCounter + Constants.NUMBEROFCARDSOFFSET - 1));
+        //headCardCounter += Constants.NUMBEROFCARDSOFFSET;
+        for (int i = 0; i < images.size(); i++) {
+            Log.e(Constants.TAG, "url :" + images.get(i).getUrl());
+            Log.e(Constants.TAG, "downsampled url :" + images.get(i).getDownSampledUrl());
+            Log.e(Constants.TAG, "id :" + images.get(i).getId());
+            imageDataList.add(new ImageData(images.get(i).getId(), images.get(i).getUrl(), images.get(i).getDownSampledUrl(), ""));
         }
+
 
         myAppAdapter.notifyDataSetChanged();
 
