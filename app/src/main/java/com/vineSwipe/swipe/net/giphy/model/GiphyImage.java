@@ -3,6 +3,7 @@ package com.vineSwipe.swipe.net.giphy.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,7 +18,9 @@ import java.util.Map;
  * <p/>
  * Created by alex on 05/10/15.
  */
-public class GiphyImage implements Parcelable {
+public class GiphyImage implements Parcelable, Serializable {
+
+
     Map<String, ImageVariation> images;
     String bitly_gif_url;
     String id;
@@ -41,7 +44,7 @@ public class GiphyImage implements Parcelable {
     }
 
     private ImageVariation getDownSampledVariation() {
-        return images.get("fixed_width_downsampled");
+        return images.get("fixed_width");
     }
 
 

@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/FollowSwipe.iml" filepath="$PROJECT_DIR$/FollowSwipe.iml" />
+      <module fileurl="file://$PROJECT_DIR$/V.Swipe.iml" filepath="$PROJECT_DIR$/V.Swipe.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
 </project>
+

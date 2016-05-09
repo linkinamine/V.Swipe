@@ -14,6 +14,8 @@ import android.widget.FrameLayout;
 
 import com.vineSwipe.swipe.R;
 
+import java.io.IOException;
+
 
 /**
  * Created by dionysis_lorentzos on 5/8/14
@@ -230,7 +232,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
                     }
 
                     @Override
-                    public void rightExit(Object dataObject) {
+                    public void rightExit(Object dataObject) throws IOException {
                         mFlingListener.onRightCardExit(dataObject);
                     }
 
@@ -313,7 +315,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 
         void onLeftCardExit(Object dataObject);
 
-        void onRightCardExit(Object dataObject);
+        void onRightCardExit(Object dataObject) throws IOException;
 
         void onAdapterAboutToEmpty(int itemsInAdapter);
 

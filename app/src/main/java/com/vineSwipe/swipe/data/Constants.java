@@ -13,7 +13,8 @@ public final class Constants {
     public static int NUMBEROFCARDS = 30;
     public static int NUMBEROFCARDSOFFSET = 5;
     public static int NUMBEROFCARDTHRESHOLD = 2;
-
+    public static int CARD_WIDTH = 320;
+    public static int CARD_HEIGHT = 300;
 
     public static String TAG = "com.vineSwipe.swipe";
 

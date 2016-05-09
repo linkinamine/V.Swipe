@@ -12,6 +12,8 @@ import android.view.animation.OvershootInterpolator;
 
 import com.vineSwipe.swipe.MainActivity;
 
+import java.io.IOException;
+
 
 /**
  * Created by dionysis_lorentzos on 5/8/14
@@ -260,7 +262,11 @@ public class FlingCardListener implements View.OnTouchListener {
                             mFlingListener.leftExit(dataObject);
                         } else {
                             mFlingListener.onCardExited();
-                            mFlingListener.rightExit(dataObject);
+                            try {
+                                mFlingListener.rightExit(dataObject);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                         isAnimationRunning = false;
                     }
@@ -341,7 +347,7 @@ public class FlingCardListener implements View.OnTouchListener {
 
         void leftExit(Object dataObject);
 
-        void rightExit(Object dataObject);
+        void rightExit(Object dataObject) throws IOException;
 
         void onClick(Object dataObject);
 

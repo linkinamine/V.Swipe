@@ -1,5 +1,7 @@
 package com.vineSwipe.swipe.net.giphy.model;
 
+import java.io.Serializable;
+
 /**
  * An object describing a variation of an image on the Giphy service.
  * <p/>
@@ -8,7 +10,7 @@ package com.vineSwipe.swipe.net.giphy.model;
  * <p/>
  * Created by alex on 05/10/15.
  */
-class ImageVariation {
+class ImageVariation implements Serializable {
     int width;
     int height;
     int size;
