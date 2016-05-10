@@ -12,12 +12,14 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.engine.cache.DiskCache;
 import com.bumptech.glide.load.engine.cache.InternalCacheDiskCacheFactory;
 import com.bumptech.glide.load.resource.gif.GifDrawable;
@@ -25,6 +27,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.vineSwipe.swipe.data.Constants;
 import com.vineSwipe.swipe.data.ImageData;
+import com.vineSwipe.swipe.helpers.DiskOperations;
 import com.vineSwipe.swipe.helpers.StubHelper;
 import com.vineSwipe.swipe.net.NetworkManager;
 import com.vineSwipe.swipe.net.giphy.TrendingRequest;
@@ -34,10 +37,7 @@ import com.vineSwipe.swipe.views.tindercard.FlingCardListener;
 import com.vineSwipe.swipe.views.tindercard.SwipeFlingAdapterView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     private GlideBuilder glideBuilder;
     private GiphyImage giphyImage;
     private File sdCard, dir;
+    List<ImageData> imageDataListLocal;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -71,94 +72,18 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(Constants.TAG, " onCreate " + getClass().getCanonicalName());
-        Log.e("Glide.getPhotoCacheDir(context) : ", "" + Glide.getPhotoCacheDir(getApplicationContext()).listFiles().length);
+        Log.e("Glide.getPhotoCacheDir(context) : ", "" + Glide.getPhotoCacheDir(getApplicationContext()).listFiles());
 
         setupElements();
         setupListeners();
         loadRecent();
-        LoadLocalGifs();
-
-    }
-
-    private void writeGifs(GiphyImage giphyImage) {
-        File file = new File(dir, giphyImage.getId());
-        FileOutputStream fos = null;
-        dir.mkdir();
         try {
-            fos = new FileOutputStream(file);
-        } catch (FileNotFoundException f) {
-            f.printStackTrace();
+            LoadLocalGifs();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        try {
-            ObjectOutputStream os = new ObjectOutputStream(fos);
-            os.writeObject(giphyImage);
-            os.close();
-            fos.close();
-
-        } catch (IOException i) {
-            i.printStackTrace();
-        }
-        // fos = getApplicationContext().openFileOutput(giphyImages.get(0).getId(), Context.MODE_PRIVATE);
-
-    }
-
-    public static boolean canWriteOnExternalStorage() {
-        // get the state of your external storage
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            // if storage is mounted return true
-            Log.d(Constants.TAG, "can write to external storage");
-            return true;
-        }
-        return false;
-    }
-
-    private void LoadLocalGifs() {
-
-//        FileInputStream fis= new FileInputStream();
-//        ObjectInputStream is = null;
-//        try {
-//            fis = getApplicationContext().openFileInput(giphyImages.get(0).getId());
-//            try {
-//                is = new ObjectInputStream(fis);
-//            } catch (ObjectStreamException o) {
-//                o.printStackTrace();
-//            } catch (IOException i) {
-//                i.printStackTrace();
-//            }
-//            try {
-//                giphyImage = (GiphyImage) is.readObject();
-//                is.close();
-//                fis.close();
-//            } catch (OptionalDataException op) {
-//                op.printStackTrace();
-//            } catch (ClassNotFoundException c) {
-//                c.printStackTrace();
-//            } catch (IOException io) {
-//                io.printStackTrace();
-//            }
-//
-//            Log.d(Constants.TAG, "image id after saving" + giphyImage.getId().toString());
-//        } catch (FileNotFoundException f) {
-//            f.printStackTrace();
-//        }
-        String path = sdCard + "/gifs";
-        File f = null;
-        List<File> files = null;
-        Log.d("Files", "Path: " + path);
-        if (path != null) {
-            f = new File(path);
-        }
-        if (f != null) {
-            if (f.listFiles() != null) {
-                Log.d("Files", "Size: " + f.listFiles().length);
-                for (int i = 0; i < f.listFiles().length; i++) {
-                    Log.d("Files", "FileName:" + f.listFiles()[i].getName());
-
-                }
-            }
-        }
-
 
     }
 
@@ -175,8 +100,10 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 new InternalCacheDiskCacheFactory(getApplicationContext(), "gifSwipe", DiskCache.Factory.DEFAULT_DISK_CACHE_SIZE));
         sdCard = Environment.getExternalStorageDirectory();
         dir = new File(sdCard.getAbsolutePath() + "/gifs");
+        imageDataListLocal = new ArrayList<ImageData>();
 
     }
+
 
     private void setupListeners() {
         Log.d(Constants.TAG, " setupListeners");
@@ -203,15 +130,12 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             public void onRightCardExit(Object dataObject) throws IOException {
                 Log.d(Constants.TAG, " onRightCardExit");
                 Log.e(Constants.TAG, imageDataList.get(0).getImagePathThumbnail());
-                Log.d(Constants.TAG, "image id before saving" + giphyImages.get(0).getId().toString());
-                if (canWriteOnExternalStorage()) {
+                Log.d(Constants.TAG, "image id before saving" + imageDataList.get(0).getId().toString());
+                Log.d(Constants.TAG, "image resource id before saving" + imageDataList.get(0).getGifDrawable().toString());
 
-                    writeGifs(giphyImages.get(0));
-                }
-
+                writeGifs(imageDataList.get(0));
 
                 imageDataList.remove(0);
-
                 myAppAdapter.notifyDataSetChanged();
 
             }
@@ -263,6 +187,30 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         });
     }
 
+    //**************************Disk operations********************************************
+
+    /**
+     * @param giphyImageData
+     */
+
+    private void writeGifs(ImageData giphyImageData) {
+        if (DiskOperations.isSdReadable() == 1)
+            DiskOperations.saveImageToExternalStorage(getApplicationContext(), giphyImageData);
+        else {
+            Toast.makeText(getApplicationContext(), "Could not save image", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    private void LoadLocalGifs() throws ClassNotFoundException, IOException {
+
+        DiskOperations.getThumbnails();
+    }
+    //**************************End of Disk operations********************************************
+
     private void resetAllCounters() {
         Log.d(Constants.TAG, "resetAllCounters");
 
@@ -311,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         for (int i = 0; i < images.size(); i++) {
             Log.e(Constants.TAG, "url :" + images.get(i).getUrl());
             Log.e(Constants.TAG, "id :" + images.get(i).getDownSampledUrl());
-            imageDataList.add(new ImageData(images.get(i).getId(), images.get(i).getUrl(), images.get(i).getDownSampledUrl(), ""));
+            imageDataList.add(new ImageData(images.get(i).getId(), images.get(i).getUrl(), images.get(i).getDownSampledUrl(), "", null));
         }
 
 
@@ -382,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             viewHolder.dataText.setText(parkingList.get(position).getDescription() + "");
 
             Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathThumbnail()).asGif().thumbnail(Glide.with(context.getApplicationContext()).load(R.raw.loading_big).asGif())
-                    .error(R.drawable.error).dontAnimate().listener(new RequestListener<String, GifDrawable>() {
+                    .error(R.drawable.error).diskCacheStrategy(DiskCacheStrategy.RESULT).listener(new RequestListener<String, GifDrawable>() {
                 @Override
                 public boolean onException(Exception e, String model, Target<GifDrawable> target, boolean isFirstResource) {
                     if (e != null)
@@ -392,8 +340,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
                 @Override
                 public boolean onResourceReady(GifDrawable resource, String model, Target<GifDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                    Log.d(Constants.TAG, "onResourceReady RequestListener");
+                    Log.d(Constants.TAG, "onResourceReady RequestListener " + resource.toString());
                     //Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathFull()).asGif();
+                    imageDataList.get(position).setGifDrawable(resource.getFirstFrame());
                     return false;
                 }
 

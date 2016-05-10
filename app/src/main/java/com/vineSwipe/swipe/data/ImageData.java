@@ -1,22 +1,28 @@
 package com.vineSwipe.swipe.data;
 
+import android.graphics.Bitmap;
+
+import java.io.Serializable;
+
 /**
  * Created by nirav on 05/10/15.
  */
-public class ImageData {
+public class ImageData implements Serializable {
 
 
     private String description;
     private String imagePathFull;
     private String imagePathThumbnail;
     private String id;
+    private Bitmap gifDrawable;
 
 
-    public ImageData(String id, String imagePathFull, String imagePathThumbnail, String description) {
+    public ImageData(String id, String imagePathFull, String imagePathThumbnail, String description, Bitmap gifDrawable) {
         this.id = id;
         this.imagePathFull = imagePathFull;
         this.description = description;
         this.imagePathThumbnail = imagePathThumbnail;
+        this.gifDrawable = gifDrawable;
     }
 
     public ImageData() {
@@ -52,5 +58,13 @@ public class ImageData {
 
     public void setImagePathFull(String imagePathFull) {
         this.imagePathFull = imagePathFull;
+    }
+
+    public Bitmap getGifDrawable() {
+        return gifDrawable;
+    }
+
+    public void setGifDrawable(Bitmap gifDrawable) {
+        this.gifDrawable = gifDrawable;
     }
 }
