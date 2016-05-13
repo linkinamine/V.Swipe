@@ -3,7 +3,6 @@ package com.vineSwipe.swipe.helpers;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import com.vineSwipe.swipe.data.Constants;
@@ -27,7 +26,7 @@ import java.util.List;
 public class DiskOperations {
 
 
-    public final static String APP_PATH_SD_CARD = "/gifs/";
+    /*public final static String APP_PATH_SD_CARD = "/gifs/";
     public final static String APP_THUMBNAIL_PATH_SD_CARD = "thumbnails";
 
     public static boolean saveImageToExternalStorage(Context context, ImageData image) {
@@ -41,21 +40,23 @@ public class DiskOperations {
 
             OutputStream fOut = null;
             File file = new File(fullPath, image.getId());
-            file.createNewFile();
 
+            file.createNewFile();
             fOut = new FileOutputStream(file);
-            fOut.write(image.getImagePathThumbnail().getBytes(Charset.forName("UTF-8")));
+
             // 100 means no compression, the lower you go, the stronger the compression
             image.getGifDrawable().compress(Bitmap.CompressFormat.PNG, 100, fOut);
+            fOut.write(image.getImagePathThumbnail().getBytes(Charset.forName("UTF-8")));
+
             fOut.flush();
             fOut.close();
 
-            MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), file.getName(), file.getName());
+            //MediaStore.Images.Media.insertImage(context.getContentResolver(), file.getAbsolutePath(), file.getName(), image.getImagePathThumbnail());
 
             return true;
 
         } catch (Exception e) {
-            Log.e("saveToExternalStorage()", e.getMessage());
+            Log.e(Constants.TAG + "saveToExternalStorage()", e.getMessage());
             return false;
         }
     }
@@ -73,7 +74,7 @@ public class DiskOperations {
 
             return true;
         } catch (Exception e) {
-            Log.e("saveToInternalStorage()", e.getMessage());
+            Log.e(Constants.TAG + "saveToInternalStorage()", e.getMessage());
             return false;
         }
     }
@@ -85,10 +86,10 @@ public class DiskOperations {
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             // We can read and write the media
             mExternalStorageAvailable = 1;
-            Log.i("isSdReadable isWritable", "External storage card is readable and writable.");
+            Log.i(Constants.TAG + "isSdReadable isWritable", "External storage card is readable and writable.");
         } else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             // We can only read the media
-            Log.i("isSdReadable", "External storage card is readable.");
+            Log.i(Constants.TAG + "isSdReadable", "External storage card is readable.");
             mExternalStorageAvailable = 2;
         } else {
             // Something else is wrong. It may be one of many other
@@ -106,13 +107,13 @@ public class DiskOperations {
         File f = null;
 
 
-        Log.d("Files", "Path: " + fullPath);
+        Log.d(Constants.TAG + "Files", "Path: " + fullPath);
         if (fullPath != null) {
             f = new File(fullPath);
         }
         if (f != null) {
             if (f.listFiles() != null) {
-                Log.d("Files", "Size: " + f.listFiles().length);
+                Log.d(Constants.TAG + "Files", "Size: " + f.listFiles().length);
                 for (int i = 0; i < f.listFiles().length; i++) {
                     Log.d(Constants.TAG, "FileName:" + f.listFiles()[i].getName());
                     File file = f.listFiles()[i];
@@ -135,7 +136,7 @@ public class DiskOperations {
 
 
 // If no file on external storage, look in internal storage
-                  /*  if (thumbnail == null) {
+                  *//*  if (thumbnail == null) {
                         try {
                             File filePath = context.getFileStreamPath(filename);
                             FileInputStream fi = new FileInputStream(filePath);
@@ -143,11 +144,11 @@ public class DiskOperations {
                         } catch (Exception ex) {
                             Log.e("getThumbnail() on internal storage", ex.getMessage());
                         }
-                    }*/
+                    }*//*
                 }
 
             }
         }
         return thumbnails;
-    }
+    }*/
 }

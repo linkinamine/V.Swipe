@@ -12,7 +12,6 @@ import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -27,7 +26,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.vineSwipe.swipe.data.Constants;
 import com.vineSwipe.swipe.data.ImageData;
-import com.vineSwipe.swipe.helpers.DiskOperations;
+import com.vineSwipe.swipe.helpers.IoOperations;
 import com.vineSwipe.swipe.helpers.StubHelper;
 import com.vineSwipe.swipe.net.NetworkManager;
 import com.vineSwipe.swipe.net.giphy.TrendingRequest;
@@ -130,8 +129,10 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             public void onRightCardExit(Object dataObject) throws IOException {
                 Log.d(Constants.TAG, " onRightCardExit");
                 Log.e(Constants.TAG, imageDataList.get(0).getImagePathThumbnail());
-                Log.d(Constants.TAG, "image id before saving" + imageDataList.get(0).getId().toString());
-                Log.d(Constants.TAG, "image resource id before saving" + imageDataList.get(0).getGifDrawable().toString());
+                if (imageDataList.get(0).getId() != null)
+                    Log.d(Constants.TAG, "image id before saving" + imageDataList.get(0).getId().toString());
+                //   if (imageDataList.get(0).getFirstFrameBytes() != null)
+                //     Log.d(Constants.TAG, "image resource id before saving" + imageDataList.get(0).getFirstFrameBytes().toString());
 
                 writeGifs(imageDataList.get(0));
 
@@ -194,11 +195,14 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
      */
 
     private void writeGifs(ImageData giphyImageData) {
+/*
         if (DiskOperations.isSdReadable() == 1)
             DiskOperations.saveImageToExternalStorage(getApplicationContext(), giphyImageData);
         else {
             Toast.makeText(getApplicationContext(), "Could not save image", Toast.LENGTH_LONG).show();
         }
+*/
+        IoOperations.writeRecordsToFile(giphyImageData, getApplicationContext());
     }
 
     /**
@@ -207,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
      */
     private void LoadLocalGifs() throws ClassNotFoundException, IOException {
 
-        DiskOperations.getThumbnails();
+        // DiskOperations.getThumbnails();
+        IoOperations.readRecordsFromFile(getApplicationContext());
     }
     //**************************End of Disk operations********************************************
 
@@ -342,11 +347,11 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 public boolean onResourceReady(GifDrawable resource, String model, Target<GifDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
                     Log.d(Constants.TAG, "onResourceReady RequestListener " + resource.toString());
                     //Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathFull()).asGif();
-                    imageDataList.get(position).setGifDrawable(resource.getFirstFrame());
+                    //  imageDataList.get(position).setFirstFrameBytes(null);
                     return false;
                 }
 
-            }).override(Constants.CARD_WIDTH, Constants.CARD_HEIGHT).into(viewHolder.cardImage);
+            }).into(viewHolder.cardImage);
             //
             return rowView;
         }

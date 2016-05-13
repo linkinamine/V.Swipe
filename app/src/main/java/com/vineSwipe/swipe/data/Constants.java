@@ -16,6 +16,8 @@ public final class Constants {
     public static int CARD_WIDTH = 320;
     public static int CARD_HEIGHT = 300;
 
+    public static int COMPRESSION_RATE = 10;
+
     public static String TAG = "com.vineSwipe.swipe";
 
 
