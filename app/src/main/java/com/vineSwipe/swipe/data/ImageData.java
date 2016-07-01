@@ -1,5 +1,7 @@
 package com.vineSwipe.swipe.data;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 /**
@@ -12,15 +14,15 @@ public class ImageData implements Serializable {
     private String imagePathFull;
     private String imagePathThumbnail;
     private String id;
-   // private byte[] firstFrameBytes;
+    private Bitmap firstFrame;
 
 
-    public ImageData(String id, String imagePathFull, String imagePathThumbnail, String description, byte[] firstFrameBytes) {
+    public ImageData(String id, String imagePathFull, String imagePathThumbnail, String description, Bitmap firstFrameBytes) {
         this.id = id;
         this.imagePathFull = imagePathFull;
         this.description = description;
         this.imagePathThumbnail = imagePathThumbnail;
-      //  this.firstFrameBytes = firstFrameBytes;
+        this.firstFrame = firstFrameBytes;
     }
 
     public ImageData() {
@@ -59,12 +61,12 @@ public class ImageData implements Serializable {
     }
 
 
-//    public byte[] getFirstFrameBytes() {
-//        return firstFrameBytes;
-//    }
-//
-//    public void setFirstFrameBytes(byte[] firstFrameBytes) {
-//        this.firstFrameBytes = firstFrameBytes;
-//    }
+    public Bitmap getFirstFrame() {
+        return firstFrame;
+    }
+
+    public void setFirstFrame(Bitmap firstFrameBytes) {
+        this.firstFrame = firstFrameBytes;
+    }
 }
 

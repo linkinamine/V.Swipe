@@ -49,12 +49,13 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     private ArrayList<ImageData> imageDataList;
     private SwipeFlingAdapterView flingContainer;
-    private List<GiphyImage> giphyImages;
+    private List<GiphyImage> giphyImages, fileterdCards;
     private Map<String, GiphyImage> imagesToSave;
     private GlideBuilder glideBuilder;
     private GiphyImage giphyImage;
     private File sdCard, dir;
-    List<ImageData> imageDataListLocal;
+    List<String> localImageIds;
+    private int cardPosition;
 
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -89,8 +90,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     private void setupElements() {
         Log.d(Constants.TAG, " setupElements");
         flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
-        imageDataList = new ArrayList<>();
-        giphyImages = new ArrayList<>();
+        imageDataList = new ArrayList<ImageData>();
+        giphyImages = new ArrayList<GiphyImage>();
+        fileterdCards = new ArrayList<GiphyImage>();
         myAppAdapter = new MyAppAdapter(imageDataList, MainActivity.this);
         flingContainer.setAdapter(myAppAdapter);
         imagesToSave = new HashMap<String, GiphyImage>();
@@ -99,7 +101,8 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                 new InternalCacheDiskCacheFactory(getApplicationContext(), "gifSwipe", DiskCache.Factory.DEFAULT_DISK_CACHE_SIZE));
         sdCard = Environment.getExternalStorageDirectory();
         dir = new File(sdCard.getAbsolutePath() + "/gifs");
-        imageDataListLocal = new ArrayList<ImageData>();
+        localImageIds = new ArrayList<String>();
+        cardPosition = 0;
 
     }
 
@@ -116,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
             public void onLeftCardExit(Object dataObject) {
                 Log.d(Constants.TAG, " onLeftCardExit");
                 Log.e(Constants.TAG, imageDataList.get(0).getImagePathThumbnail());
+                IoOperations.leftSwipedFilesIds(imageDataList.get(0).getId());
                 imageDataList.remove(0);
                 myAppAdapter.notifyDataSetChanged();
 
@@ -195,13 +199,7 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
      */
 
     private void writeGifs(ImageData giphyImageData) {
-/*
-        if (DiskOperations.isSdReadable() == 1)
-            DiskOperations.saveImageToExternalStorage(getApplicationContext(), giphyImageData);
-        else {
-            Toast.makeText(getApplicationContext(), "Could not save image", Toast.LENGTH_LONG).show();
-        }
-*/
+
         IoOperations.writeRecordsToFile(giphyImageData, getApplicationContext());
     }
 
@@ -211,7 +209,6 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
      */
     private void LoadLocalGifs() throws ClassNotFoundException, IOException {
 
-        // DiskOperations.getThumbnails();
         IoOperations.readRecordsFromFile(getApplicationContext());
     }
     //**************************End of Disk operations********************************************
@@ -259,16 +256,37 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
 
     private void fillCardView(List<GiphyImage> images) {
         Log.d(Constants.TAG, " fillCardView  ");
-        // images = images.subList(headCardCounter, (headCardCounter + Constants.NUMBEROFCARDSOFFSET - 1));
-        //headCardCounter += Constants.NUMBEROFCARDSOFFSET;
-        for (int i = 0; i < images.size(); i++) {
-            Log.e(Constants.TAG, "url :" + images.get(i).getUrl());
-            Log.e(Constants.TAG, "id :" + images.get(i).getDownSampledUrl());
-            imageDataList.add(new ImageData(images.get(i).getId(), images.get(i).getUrl(), images.get(i).getDownSampledUrl(), "", null));
+
+        fileterdCards = filterAlreadySwiped(images);
+        for (int i = 0; i < fileterdCards.size(); i++) {
+            imageDataList.add(new ImageData(fileterdCards.get(i).getId(), fileterdCards.get(i).getUrl(), fileterdCards.get(i).getDownSampledUrl(), "", null));
         }
 
-
         myAppAdapter.notifyDataSetChanged();
+
+    }
+
+    private List<GiphyImage> filterAlreadySwiped(List<GiphyImage> images) {
+        Log.d(Constants.TAG, " filterAlreadySwiped  ");
+
+        Log.d(Constants.TAG, " images size before  " + images.size());
+
+        localImageIds = IoOperations.getFileIds();
+        for (int i = 0; i < localImageIds.size(); i++) {
+            for (int j = 0; j < images.size(); j++) {
+                Log.d(Constants.TAG, "local images:   " + localImageIds.get(i));
+                Log.d(Constants.TAG, " images:   " + images.get(i).getId());
+
+                if (localImageIds.get(i) == images.get(j).getId()) {
+                    Log.d(Constants.TAG, "removing cards");
+                    images.remove(j);
+                }
+            }
+        }
+        Log.d(Constants.TAG, " images size after  " + images.size());
+
+        return images;
+
 
     }
 
@@ -348,6 +366,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
                     Log.d(Constants.TAG, "onResourceReady RequestListener " + resource.toString());
                     //Glide.with(context.getApplicationContext()).load(parkingList.get(position).getImagePathFull()).asGif();
                     //  imageDataList.get(position).setFirstFrameBytes(null);
+                    cardPosition = position;
+                    imageDataList.get(0).setFirstFrame(resource.getFirstFrame());
+
                     return false;
                 }
 

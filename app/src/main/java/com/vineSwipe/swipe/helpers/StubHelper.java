@@ -13,12 +13,12 @@ import android.support.annotation.Nullable;
 public class StubHelper {
     public static void showYouBrokeItDialog(String message, @Nullable final Runnable onRetry, Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context)
-                .setTitle("You broke it")
+                .setTitle("Check your connection fellow giffer")
                 .setMessage(message)
-                .setNegativeButton("Oh well", null);
+                .setNegativeButton("No Thanks", null);
 
         if (onRetry != null) {
-            builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton("Ok,I did ", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     onRetry.run();

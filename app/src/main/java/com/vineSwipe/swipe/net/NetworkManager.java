@@ -27,7 +27,7 @@ public class NetworkManager {
     private ImageLoader mImageLoader;
     private static Context mCtx;
 
-    private NetworkManager(Context context) {
+        private NetworkManager(Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
 

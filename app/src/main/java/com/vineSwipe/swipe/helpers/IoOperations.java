@@ -1,19 +1,18 @@
 package com.vineSwipe.swipe.helpers;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.util.Log;
 
 import com.vineSwipe.swipe.data.Constants;
 import com.vineSwipe.swipe.data.ImageData;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,77 +22,90 @@ import java.util.List;
 
 public class IoOperations {
 
+    private static List<String> fileIds = new ArrayList<String>();
 
-    public static boolean writeRecordsToFile(ImageData imageData, Context context) {
-        FileOutputStream fos;
-        ObjectOutputStream oos = null;
+    private static File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
+            + "/Android/data/" + Constants.TAG
+            + "/Files");
+
+    public static void writeRecordsToFile(ImageData imageData, Context context) {
+        File pictureFile = getOutputMediaFile(imageData.getId(), context);
+        if (pictureFile == null) {
+            Log.d(Constants.TAG,
+                    "Error creating media file, check storage permissions: ");// e.getMessage());
+            return;
+        }
         try {
-            fos = context.openFileOutput(imageData.getId(), Context.MODE_PRIVATE);
-            oos = new ObjectOutputStream(fos);
-            oos.writeObject(imageData);
-            oos.close();
-            Log.d(Constants.TAG, "Cant save records");
-
-            return true;
-        } catch (Exception e) {
-            Log.e(Constants.TAG, "Cant save records" + e.getMessage());
-            return false;
-        } finally {
-            if (oos != null)
-                try {
-                    oos.close();
-                } catch (Exception e) {
-                    Log.e(Constants.TAG, "Error while closing stream " + e.getMessage());
-                }
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            imageData.getFirstFrame().compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.close();
+        } catch (FileNotFoundException e) {
+            Log.d(Constants.TAG, "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(Constants.TAG, "Error accessing file: " + e.getMessage());
         }
     }
 
-    public static List<ImageData> readRecordsFromFile(Context context) {
-        FileInputStream fin;
-        ObjectInputStream ois;
-        File[] files = context.getFilesDir().listFiles();
-        ArrayList<ImageData> records = new ArrayList<>();
-        Log.d(Constants.TAG, "dir AbsolutePath " + context.getFilesDir().getAbsolutePath());
+    public static List<Bitmap> readRecordsFromFile(Context context) {
 
-
-        if (files != null) {
-            Log.v(Constants.TAG, "files length " + files.length);
-
-            // for (int i = 0; i < files.length; i++) {
-            try {
-
-                fin = context.openFileInput(files[0].getName());
-                Log.d(Constants.TAG, "fin " + fin.toString());
-
-                ois = new ObjectInputStream(fin);
-                Log.d(Constants.TAG, "ois " + ois.toString());
-
-                records.add((ImageData) ois.readObject());
-                Log.d(Constants.TAG, "records " + records.get(0).getId());
-
-                ois.close();
-                Log.v(Constants.TAG, "Records read successfully");
-
-            } catch (FileNotFoundException fne) {
-                fne.printStackTrace();
-            } catch (StreamCorruptedException sce) {
-                sce.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } catch (ClassNotFoundException cne) {
-                cne.printStackTrace();
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                return null;
             }
-//                finally {
-//                    if (ois != null)
-//                        try {
-//                            ois.close();
-//                        } catch (Exception e) {
-//                            Log.e(Constants.TAG, "Error in closing stream while reading records" + e.getMessage());
-//                        }
-//                }
         }
-        //  }
-        Log.d(Constants.TAG, "records size " + records.size());
-        return records;
+        File[] files = mediaStorageDir.listFiles();
+        List<Bitmap> bitmaps = new ArrayList<Bitmap>();
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inSampleSize = 8;
+        if (files != null && files.length > 0) {
+            for (int i = 0; i < files.length; i++) {
+                final Bitmap bitmap = BitmapFactory.decodeFile(files[i].getName(), options);
+                fileIds.add(files[i].getName().replace(".jpg", ""));
+                bitmaps.add(bitmap);
+
+            }
+        }
+
+        Log.e(Constants.TAG, " " + bitmaps.size());
+
+
+        return bitmaps;
     }
+
+    public static List<String> getFileIds() {
+
+        return fileIds;
+
+    }
+
+
+    public static void leftSwipedFilesIds(String fileId) {
+        fileIds.add(fileId);
+    }
+
+    /**
+     * Create a File for saving an image or video
+     */
+    private static File getOutputMediaFile(String imageName, Context context) {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+
+
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                return null;
+            }
+        }
+        // Create a media file name
+        File mediaFile;
+        String mImageName = imageName + ".jpg";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+        return mediaFile;
+    }
+
 }
