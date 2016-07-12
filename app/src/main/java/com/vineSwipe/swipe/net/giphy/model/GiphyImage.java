@@ -21,14 +21,40 @@ import java.util.Map;
 public class GiphyImage implements Parcelable, Serializable {
 
 
+    public static final Creator<GiphyImage> CREATOR = new Creator<GiphyImage>() {
+        @Override
+        public GiphyImage createFromParcel(Parcel source) {
+            return new GiphyImage(source);
+        }
+
+        @Override
+        public GiphyImage[] newArray(int size) {
+            return new GiphyImage[size];
+        }
+    };
     Map<String, ImageVariation> images;
     String bitly_gif_url;
     String id;
 
-
     public GiphyImage() {
         // Empty constructor required because otherwise the Parcelable constructor
         // prevents GSON from being able to instantiate GiphyImages via reflection.
+    }
+
+
+    public GiphyImage(String id) {
+        this.id = id;
+    }
+
+    private GiphyImage(Parcel in) {
+        ImageVariation variation = new ImageVariation();
+        bitly_gif_url = in.readString();
+        variation.webp = in.readString();
+        variation.width = in.readInt();
+        variation.height = in.readInt();
+        id = in.readString();
+        images = new HashMap<>();
+        images.put("fixed_width", variation);
     }
 
     public String getId() {
@@ -46,7 +72,6 @@ public class GiphyImage implements Parcelable, Serializable {
     private ImageVariation getDownSampledVariation() {
         return images.get("fixed_width");
     }
-
 
     /**
      * @return a URL for the web page the gif is hosted on, suitable for sharing.
@@ -73,6 +98,8 @@ public class GiphyImage implements Parcelable, Serializable {
         return getPreferredVariation().width;
     }
 
+    /// PARCELABLE IMPLEMENTATION
+
     public int getHeight() {
         return getPreferredVariation().height;
     }
@@ -85,8 +112,6 @@ public class GiphyImage implements Parcelable, Serializable {
         ImageVariation variation = getPreferredVariation();
         return Math.round(variation.height * (width / (float) variation.width));
     }
-
-    /// PARCELABLE IMPLEMENTATION
 
     @Override
     public int describeContents() {
@@ -102,27 +127,4 @@ public class GiphyImage implements Parcelable, Serializable {
         out.writeInt(getHeight());
         out.writeString(getId());
     }
-
-    private GiphyImage(Parcel in) {
-        ImageVariation variation = new ImageVariation();
-        bitly_gif_url = in.readString();
-        variation.webp = in.readString();
-        variation.width = in.readInt();
-        variation.height = in.readInt();
-        id = in.readString();
-        images = new HashMap<>();
-        images.put("fixed_width", variation);
-    }
-
-    public static final Creator<GiphyImage> CREATOR = new Creator<GiphyImage>() {
-        @Override
-        public GiphyImage createFromParcel(Parcel source) {
-            return new GiphyImage(source);
-        }
-
-        @Override
-        public GiphyImage[] newArray(int size) {
-            return new GiphyImage[size];
-        }
-    };
 }

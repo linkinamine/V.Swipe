@@ -1,0 +1,15 @@
+
+onAdapterAboutToEmpty
+
+                              /*if (headCardCounter < Constants.NUMBEROFCARDS) {
+                    if (itemsInAdapter == Constants.NUMBEROFCARDTHRESHOLD) {
+                        headCardCounter = (headCardCounter + Constants.NUMBEROFCARDSOFFSET) - itemsInAdapter;
+                        Log.d(Constants.TAG, "  getting next " + headCardCounter + " items");
+                        fillCardView(giphyImages);
+                    }
+                } else {
+                    Log.d(Constants.TAG, " headCardCounter == Constants.NUMBEROFCARDS " + headCardCounter + " = " + Constants.NUMBEROFCARDS);
+                    resetAllCounters();
+                    Glide.with(getApplicationContext()).load(R.raw.loading_small).asGif().error(R.drawable.error);
+                    loadRecent();
+                }*/

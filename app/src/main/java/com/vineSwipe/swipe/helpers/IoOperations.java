@@ -28,25 +28,34 @@ public class IoOperations {
             + "/Android/data/" + Constants.TAG
             + "/Files");
 
-    public static void writeRecordsToFile(ImageData imageData, Context context) {
-        File pictureFile = getOutputMediaFile(imageData.getId(), context);
-        if (pictureFile == null) {
-            Log.d(Constants.TAG,
-                    "Error creating media file, check storage permissions: ");// e.getMessage());
-            return;
+    public static void writeRecordsToFile(List<ImageData> imagesData, Context context) {
+
+        Log.d(Constants.TAG, "writeRecordsToFile : " + imagesData.size());
+        for (int i = 0; i < imagesData.size(); i++) {
+
+            File pictureFile = getOutputMediaFile(imagesData.get(i).getId(), context);
+            if (pictureFile == null) {
+                Log.d(Constants.TAG,
+                        "Error creating media file, check storage permissions: ");// e.getMessage());
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                imagesData.get(i).getFirstFrame().compress(Bitmap.CompressFormat.PNG, 90, fos);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                Log.d(Constants.TAG, "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d(Constants.TAG, "Error accessing file: " + e.getMessage());
+            }
+
         }
-        try {
-            FileOutputStream fos = new FileOutputStream(pictureFile);
-            imageData.getFirstFrame().compress(Bitmap.CompressFormat.PNG, 90, fos);
-            fos.close();
-        } catch (FileNotFoundException e) {
-            Log.d(Constants.TAG, "File not found: " + e.getMessage());
-        } catch (IOException e) {
-            Log.d(Constants.TAG, "Error accessing file: " + e.getMessage());
-        }
+
     }
 
     public static List<Bitmap> readRecordsFromFile(Context context) {
+
+        Log.d(Constants.TAG, "readRecordsFromFile : ");
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
@@ -75,12 +84,16 @@ public class IoOperations {
 
     public static List<String> getFileIds() {
 
+        Log.d(Constants.TAG, "getFileIds : ");
+
         return fileIds;
 
     }
 
 
     public static void leftSwipedFilesIds(String fileId) {
+        Log.d(Constants.TAG, "leftSwipedFilesIds : ");
+
         fileIds.add(fileId);
     }
 
@@ -96,6 +109,9 @@ public class IoOperations {
         // between applications and persist after your app has been uninstalled.
 
         // Create the storage directory if it does not exist
+
+        Log.d(Constants.TAG, "getOutputMediaFile : ");
+
         if (!mediaStorageDir.exists()) {
             if (!mediaStorageDir.mkdirs()) {
                 return null;
