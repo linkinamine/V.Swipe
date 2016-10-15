@@ -2,7 +2,6 @@ package com.vineSwipe.swipe.helpers;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 
@@ -28,12 +27,12 @@ public class IoOperations {
             + "/Android/data/" + Constants.TAG
             + "/Files");
 
-    public static void writeRecordsToFile(List<ImageData> imagesData, Context context) {
+    public static void writeRecordsToFile(List<ImageData> imagesData, Context context, boolean isRightSwiped) {
 
         Log.d(Constants.TAG, "writeRecordsToFile : " + imagesData.size());
         for (int i = 0; i < imagesData.size(); i++) {
 
-            File pictureFile = getOutputMediaFile(imagesData.get(i).getId(), context);
+            File pictureFile = getOutputMediaFile(imagesData.get(i).getId(), context, isRightSwiped);
             if (pictureFile == null) {
                 Log.d(Constants.TAG,
                         "Error creating media file, check storage permissions: ");// e.getMessage());
@@ -53,9 +52,9 @@ public class IoOperations {
 
     }
 
-    public static List<Bitmap> readRecordsFromFile(Context context) {
+    public static File[] getFiles() {
 
-        Log.d(Constants.TAG, "readRecordsFromFile : ");
+        Log.d(Constants.TAG, "readIdsFromFile : ");
 
         // Create the storage directory if it does not exist
         if (!mediaStorageDir.exists()) {
@@ -64,43 +63,53 @@ public class IoOperations {
             }
         }
         File[] files = mediaStorageDir.listFiles();
-        List<Bitmap> bitmaps = new ArrayList<Bitmap>();
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inSampleSize = 8;
-        if (files != null && files.length > 0) {
-            for (int i = 0; i < files.length; i++) {
-                final Bitmap bitmap = BitmapFactory.decodeFile(files[i].getName(), options);
-                fileIds.add(files[i].getName().replace(".jpg", ""));
-                bitmaps.add(bitmap);
+
+        Log.e(Constants.TAG, " " + files);
+
+
+        return files;
+    }
+
+    public static List<String> getIdsFromFiles(boolean IsRightFiles) {
+
+        Log.d(Constants.TAG, "getIdsFromFiles : ");
+
+        // List<Bitmap> bitmaps = new ArrayList<Bitmap>();
+
+        if (getFiles() != null && getFiles().length > 0) {
+            for (int i = 0; i < getFiles().length; i++) {
+                if (IsRightFiles) {
+//                    BitmapFactory.Options options = new BitmapFactory.Options();
+//                    options.inSampleSize = 8;
+//                    final Bitmap bitmap = BitmapFactory.decodeFile(getFiles()[i].getName(), options);
+//                    fileIds.add(getFiles()[i].getName().replace(".jpg", ""));
+//                    bitmaps.add(bitmap);
+                } else {
+                    fileIds.add(getFiles()[i].getName().replace(".rmv", ""));
+                }
+
 
             }
         }
-
-        Log.e(Constants.TAG, " " + bitmaps.size());
-
-
-        return bitmaps;
-    }
-
-    public static List<String> getFileIds() {
-
-        Log.d(Constants.TAG, "getFileIds : ");
+        Log.d(Constants.TAG, "fileIds size : " + fileIds.size());
 
         return fileIds;
-
     }
 
 
-    public static void leftSwipedFilesIds(String fileId) {
-        Log.d(Constants.TAG, "leftSwipedFilesIds : ");
+    public static List<String> getLeftSwiped() {
 
-        fileIds.add(fileId);
+        Log.d(Constants.TAG, "getLefSwiped : ");
+
+
+        return getIdsFromFiles(false);
+
     }
 
     /**
      * Create a File for saving an image or video
      */
-    private static File getOutputMediaFile(String imageName, Context context) {
+    private static File getOutputMediaFile(String imageName, Context context, boolean isRightSwiped) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
 
@@ -119,7 +128,13 @@ public class IoOperations {
         }
         // Create a media file name
         File mediaFile;
-        String mImageName = imageName + ".jpg";
+        String mImageName;
+
+        if (isRightSwiped)
+            mImageName = imageName + ".jpg";
+        else
+            mImageName = imageName + ".rmv";
+
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
         return mediaFile;
     }

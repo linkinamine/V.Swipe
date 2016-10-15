@@ -10,7 +10,7 @@ public final class Constants {
      */
     public static final String GIPHY_KEY = "dc6zaTOxFJmzC";
 
-    public static int NUMBEROFCARDS = 10;
+    public static int NUMBEROFCARDS = 4;
     public static int NUMBEROFCARDSOFFSET = 5;
     public static int NUMBEROFCARDTHRESHOLD = 2;
     public static int CARD_WIDTH = 320;

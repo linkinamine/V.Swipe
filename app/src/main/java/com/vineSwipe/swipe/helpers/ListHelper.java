@@ -35,6 +35,7 @@ public class ListHelper {
     }
 
     public static Boolean isListSetup(List<?> myList) {
+        Log.d(Constants.TAG, " isListSetup  " + myList.size());
 
         return (myList != null && myList.size() > 0);
     }
