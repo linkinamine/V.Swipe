@@ -12,8 +12,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by mbenallouch on 10/05/2016.
@@ -49,6 +51,58 @@ public class IoOperations {
             }
 
         }
+
+    }
+
+    public static void writeLeftSwipedTofile(Context context, boolean isRightSwiped, ArrayList<String> fileIds) {
+
+        Log.d(Constants.TAG, "writeLeftSwipedTofile : ");
+
+        FileOutputStream fOut = null;
+        try {
+            fOut = new FileOutputStream(getOutputMediaFile("LeftSwiped", context, isRightSwiped), true);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
+        }
+
+        OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+        try {
+            for (int i = 0; i < fileIds.size(); i++) {
+                myOutWriter.append(fileIds.get(i));
+                myOutWriter.append("\n\r");
+            }
+            myOutWriter.close();
+            fOut.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static ArrayList<String> readLeftSwipedIds(Context context) {
+
+        Log.d(Constants.TAG, "readLeftSwipedIds : ");
+
+        ArrayList<String> leftSwipedIds = new ArrayList<String>();
+        File file = getOutputMediaFile("LeftSwiped", context, false);
+        if (file.exists())
+            try {
+                Scanner scanner = new Scanner(file);
+                scanner.useDelimiter("\n\r");
+
+                while (scanner.hasNext()) {
+                    String line = scanner.next();
+                    Log.d(Constants.TAG, "readLeftSwipedIds id : " + line);
+                    leftSwipedIds.add(line);
+
+                }
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        return leftSwipedIds;
 
     }
 
@@ -128,12 +182,11 @@ public class IoOperations {
         }
         // Create a media file name
         File mediaFile;
-        String mImageName;
+        String mImageName = imageName + "rmv";
 
         if (isRightSwiped)
             mImageName = imageName + ".jpg";
-        else
-            mImageName = imageName + ".rmv";
+
 
         mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
         return mediaFile;

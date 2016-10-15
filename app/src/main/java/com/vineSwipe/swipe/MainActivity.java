@@ -88,7 +88,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         //}
 
         if (ListHelper.isListSetup(leftImages)) {
-            writeGifs(leftImages, false);
+
+
+            writeLeftGifs(false, leftImages);
         }
         // resetAllData();
 
@@ -238,8 +240,10 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     private void fillCardView(List<GiphyImage> images) {
         Log.d(Constants.TAG, " fillCardView  ");
 
+        ArrayList<String> imageIds = new ArrayList<String>();
+        imageIds = IoOperations.readLeftSwipedIds(MainActivity.this);
+        fileterdCards = ListHelper.filterAlreadySwiped(images, imageIds);
 
-        fileterdCards = ListHelper.filterAlreadySwiped(images, IoOperations.getLeftSwiped());
         for (int i = 0; i < fileterdCards.size(); i++) {
             imageDataList.add(new ImageData(fileterdCards.get(i).getId(), fileterdCards.get(i).getUrl(), fileterdCards.get(i).getDownSampledUrl(), "", null));
         }
@@ -256,9 +260,22 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
     /**
      * @param giphyImagesData
      */
-    private void writeGifs(List<ImageData> giphyImagesData, boolean isRightSwiped) {
+    private void writeRightGifs(List<ImageData> giphyImagesData, boolean isRightSwiped) {
 
         IoOperations.writeRecordsToFile(giphyImagesData, getApplicationContext(), isRightSwiped);
+    }
+
+
+    private void writeLeftGifs(boolean isRightSwiped, ArrayList<ImageData> imageDatas) {
+
+        ArrayList<String> filesIds = new ArrayList<String>();
+
+
+        for (ImageData fIds : imageDatas) {
+            filesIds.add(fIds.getId());
+
+        }
+        IoOperations.writeLeftSwipedTofile(MainActivity.this, isRightSwiped, filesIds);
     }
 
     /**
