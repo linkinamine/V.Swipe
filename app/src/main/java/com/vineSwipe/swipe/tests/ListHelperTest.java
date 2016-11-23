@@ -1,11 +1,9 @@
-package com.vineSwipe.swipe.helpers;
+package com.vineSwipe.swipe.tests;
 
+import com.vineSwipe.swipe.helpers.ListHelper;
 import com.vineSwipe.swipe.net.giphy.model.GiphyImage;
 
 import junit.framework.TestCase;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,6 @@ public class ListHelperTest extends TestCase {
     private List<String> localImageIds;
     private List<GiphyImage> remainingImages;
 
-    @Before
     protected void setUp() throws Exception {
         super.setUp();
         images = new ArrayList<GiphyImage>(10);
@@ -41,7 +38,6 @@ public class ListHelperTest extends TestCase {
 
     }
 
-    @Test
     public void testFilterAlreadySwiped() throws Exception {
 
         remainingImages = ListHelper.filterAlreadySwiped(images, localImageIds);
@@ -55,7 +51,6 @@ public class ListHelperTest extends TestCase {
 
     }
 
-    @Test
     public void testIsListSetup() throws Exception {
 
         ListHelper.isListSetup(images);

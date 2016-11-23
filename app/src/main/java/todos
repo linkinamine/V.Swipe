@@ -1,1 +1,9 @@
+Checek if gif si complete before saving to file/DB... to avoid this :
+  Caused by: java.lang.NullPointerException: Attempt to invoke virtual method 'boolean android.graphics.Bitmap.compress(android.graphics.Bitmap$CompressFormat, int, java.io.OutputStream)' on a null object reference
+ at com.vineSwipe.swipe.helpers.IoOperations.writeRecordsToFile(IoOperations.java:45)
+at com.vineSwipe.swipe.MainActivity.writeRightGifs(MainActivity.java:407)
+
 add click on a share while swiping
+
+
+https://github.com/Giphy/GiphyAPI#rendition-guide

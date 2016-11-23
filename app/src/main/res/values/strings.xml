@@ -11,6 +11,7 @@
     <string name="client_secret">05064e88472445a19ffcdd9ce38b7354</string>
     <string name="website_url">http://Right2Follow.com</string>
     <string name="redirect_uri">https://Right2Follow</string>
+    <string name="drawer_item_crossfade_drawer_layout_drawer">crossFadeDrawer</string>
 
 
 </resources>

@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -35,13 +36,29 @@
 
     </FrameLayout>
 
+    <View
+        android:id="@+id/item_swipe_right_indicator"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="right"
+        android:alpha="0"
+        android:background="@drawable/nope" />
+
+    <View
+        android:id="@+id/item_swipe_left_indicator"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:alpha="0"
+        android:background="@drawable/like" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="end"
         android:layout_marginBottom="18dp"
         android:background="@drawable/shape"
-        android:gravity="center_horizontal"
         android:orientation="vertical">
+
 
         <FrameLayout
 
@@ -55,48 +72,64 @@
                 android:layout_height="320dp"
                 android:padding="4dp"
                 android:scaleType="fitCenter" />
+
+
         </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="top|center_horizontal"
-            android:orientation="horizontal">
+            android:layout_gravity="end"
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+            >
 
-                <TextView
-                    android:id="@+id/bookText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="left"
-                    android:padding="4dp"
-                    android:textColor="#787878"
-                    android:textSize="16sp" />
-            </ScrollView>
-        </LinearLayout>
+            <View
+                android:id="@+id/item_swipe_left"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="8dp"
+                android:alpha="0.5"
+                android:background="@drawable/like_icon" />
+
+            <View
+                android:id="@+id/item_swipe_right"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentEnd="true"
+
+                android:layout_alignParentTop="true"
+                android:layout_margin="8dp"
+                android:alpha="0.5"
+                android:background="@drawable/like_icon" />
+
+            <View
+                android:id="@+id/share"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentBottom="true"
+
+                android:layout_margin="4dp"
+                android:layout_toRightOf="@+id/item_swipe_left"
+                android:alpha="0.5"
+                android:background="@drawable/like_icon" />
+
+            <View
+                android:id="@+id/share2"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignTop="@+id/share"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_toStartOf="@+id/item_swipe_right"
+                android:alpha="0.5"
+                android:background="@drawable/like_icon" />
+
+
+        </RelativeLayout>
+
 
     </LinearLayout>
-
-
-    <View
-        android:id="@+id/item_swipe_left_indicator"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:alpha="0"
-
-        android:background="@drawable/like" />
-
-    <View
-        android:id="@+id/item_swipe_right_indicator"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_gravity="right"
-        android:alpha="0"
-
-
-        android:background="@drawable/nope" />
 
 </FrameLayout>

@@ -20,5 +20,7 @@ public final class Constants {
 
     public static String TAG = "com.vineSwipe.swipe";
 
+    public static final boolean LOADRECENT = true;
+
 
 }
