@@ -67,10 +67,9 @@ public class MainActivity extends AppCompatActivity implements FlingCardListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(Constants.TAG, " onCreate " + getClass().getCanonicalName());
-
         setupElements();
         setupListeners();
-
+//Testing pull requests
         Log.e("Glide.getPhotoCacheDir ", "" + Glide.getPhotoCacheDir(getApplicationContext()).getAbsolutePath());
 
         //   LoadLocalGifs();
